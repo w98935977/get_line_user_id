@@ -1,10 +1,10 @@
+import os
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage
-import os
 
-# 若你已經安裝 python-dotenv，打開以下兩行來讀取 .env 設定
+# ✅ 本地測試時可載入 .env，Render 上不會影響
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -21,7 +21,7 @@ def hello():
 def callback():
     signature = request.headers.get("X-Line-Signature", "")
     body = request.get_data(as_text=True)
-    print("[DEBUG] webhook body:", body)  # ✅ debug log
+    print("[DEBUG] webhook body:", body)
 
     try:
         handler.handle(body, signature)
@@ -41,5 +41,6 @@ def handle_message(event):
         TextSendMessage(text=f"你的 LINE ID 是：{user_id}")
     )
 
+# ✅ Render 部署需要綁定 0.0.0.0 才會掃描到 port
 if __name__ == "__main__":
-    app.run(port=5000)
+    app.run(host="0.0.0.0", port=5000)
